@@ -10,12 +10,26 @@ const server = createServer((req, res) => {
   if (url === "/" && method === "GET") {
     res.setHeader("Content-Type", "text/html");
     const readStream = createReadStream(join(__dirname, "./public/index.html"));
+
+    readStream.on("error", (err) => {
+      console.error(err);
+      res.statusCode = 500;
+      res.end = "Internal Server Error";
+    });
+
     readStream.pipe(res);
   } else {
+    res.statusCode = 404;
     res.setHeader("Content-Type", "text/html");
     const readStream = createReadStream(
       join(__dirname, "./public/notFound404.html")
     );
+    readStream.on("error", (err) => {
+      console.error(err);
+      res.statusCode = 500;
+      res.end("Internal Server Error");
+    });
+
     readStream.pipe(res);
   }
 });
